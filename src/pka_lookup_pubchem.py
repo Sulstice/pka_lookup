@@ -4,7 +4,7 @@
 """
 Author: Khoi Van 2020
 
-This script takes a CAS number and look up its pKa (dissociation constant) 
+This script takes a CAS number and look up its pKa (dissociation constant)
 from Pubchem and return it if found; return None, otherwise
 
 Change notes:
@@ -91,7 +91,7 @@ def pka_lookup_pubchem(identifier, namespace=None, domain='compound') -> Optiona
 
             # synonyms = []
             synonyms = pcp.get_synonyms(cid)[0]['Synonym'] or []
-            
+
             # Extract CAS number from the list of synonyms
             returned_cas = ''
             for synonym in synonyms:
@@ -119,7 +119,7 @@ def pka_lookup_pubchem(identifier, namespace=None, domain='compound') -> Optiona
                     # print(lookup_result[0].get('InChI', False))
                     # print(f'input:\n{identifier}')
                     exact_match = (identifier == lookup_result[0].get('InChI', False))
-                
+
                 elif identifier_type == 'inchikey':
                     exact_match = (identifier == lookup_result[0].get('InChIKey', False))
 
@@ -142,7 +142,7 @@ def pka_lookup_pubchem(identifier, namespace=None, domain='compound') -> Optiona
                 # print(r.text)
                 # Use python XML to parse the return result
                 tree = ET.fromstring(r.text)
-            
+
                 # Get the XML tree of <Information> only
                 info_node = tree.find('.//*{http://pubchem.ncbi.nlm.nih.gov/pug_view}Information')
 
@@ -174,12 +174,12 @@ def pka_lookup_pubchem(identifier, namespace=None, domain='compound') -> Optiona
                     'IsomericSMILES': 'Isomeric_SMILES',
                     'IUPACName': 'IUPAC_Name'
                 })
-                result = s.to_dict()            
+                result = s.to_dict()
                 return result
 
             else:
                 raise RuntimeError('pKa not found in Pubchem.')
-    
+
         else:
             raise RuntimeError('Compound not found in Pubchem.')
 
@@ -192,37 +192,15 @@ def pka_lookup_pubchem(identifier, namespace=None, domain='compound') -> Optiona
 
 
 if __name__ == "__main__":
+
     import pprint as pp
     # from pprint import pprint as print
     print = pp.PrettyPrinter(indent=1, width=80).pprint
 
-    cas_nr = '64-19-7'    # acetic acid   >>> pKa = 4.76 at 25 °C
-    # cas_nr = '75-75-2'    # methanesulfonic acid   >>> pKa = -1.86
-    # cas_nr = '2950-43-8'    # Hydroxylamine-O-sulfonic acid, no result
-    # cas_nr = '2687-12-9'
-    # print(pka_lookup_pubchem(cas_nr))
-    print(pka_lookup_pubchem(cas_nr, 'cas'))
 
-
-
-    # smiles_string = 'C1=CC(=CC=C1F)S'
-    # smiles_string = 'OC=1(N(N=C(C=1)C2(=CC=CC=C2))C)'
     smiles_string = 'OC1=CC=CC=C1'
 
-    # # Look up pKa using pka_lookup_pubchem():
-    # print(f'pKa from Pubchem using smiles: {pka_lookup_pubchem(smiles_string)}')
-    # print('pKa from Pubchem using smiles:')
-    # print(pka_lookup_pubchem(smiles_string, "smiles"))
+    print(pka_lookup_pubchem(smiles_string, "smiles"))
 
-    inchi_string = 'InChI=1S/C6H6S/c7-6-4-2-1-3-5-6/h1-5,7H'
-    # inchi_string = 'InChI=1S/C10H10N2O/c1-12-10(13)7-9(11-12)8-5-3-2-4-6-8/h2-7,13H,1H3'    # this is NOT exact match from Pubchem return search
-    # inchi_string = 'InChI=1S/C10H10N2O/c1-12-10(13)7-9(11-12)8-5-3-2-4-6-8/h2-7,11H,1H3'    # this is an exact match from Pubchem return search
-
-    # print(f'pKa from Pubchem using smiles: {pka_lookup_pubchem(inchi_string)}')
-    # print(f'pKa from Pubchem using smiles: {pka_lookup_pubchem(inchi_string, "smiles")}')    # this function call has wrong 'namespace' (should be 'inchi', not 'smiles'). Therefore, return Pubchem CID even though it is not an exact match.
-    # print(f'pKa from Pubchem using smiles:')
-    # print(pka_lookup_pubchem(inchi_string, "inchi"))
-
-    inchikey_string = 'OKKJLVBELUTLKV-UHFFFAOYSA-N'    # methanol
-    # print(f'pKa from Pubchem using InChIKey:')
-    # print(pka_lookup_pubchem(inchikey_string, "inchikey"))
+    smiles_string = 'NC1=CC=CC=C1'
+    print(pka_lookup_pubchem(smiles_string, "smiles"))
